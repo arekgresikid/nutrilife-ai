@@ -1,0 +1,79 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-brand-emerald: oklch(0.7 0.15 160);
+  --color-brand-teal: oklch(0.65 0.12 190);
+  --animate-float: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: rgba(0, 0, 0, 0.04);
+}
+
+.dark {
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.2);
+  color: #f8fafc !important; /* slate-50 */
+}
+
+.dark label {
+  color: #e2e8f0 !important; /* slate-200 */
+}
+
+.dark input, .dark select, .dark textarea {
+  color: #f8fafc !important;
+  background-color: rgba(15, 23, 42, 0.8) !important;
+}
+
+.dark .text-slate-500, .dark .text-slate-400 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 40px 0 var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: 0 16px 48px 0 var(--glass-shadow);
+  border-color: var(--color-brand-emerald);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(0.8 0.05 160);
+  border-radius: 10px;
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, oklch(0.6 0.15 160) 0%, oklch(0.5 0.15 190) 100%);
+}
+
