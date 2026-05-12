@@ -460,8 +460,8 @@ export default function App() {
                   <div>
                     <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Kalori (kkal)</p>
 
-                    <div className="h-24">
-                      <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-24 min-h-[96px] w-full">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <BarChart
                           data={[
                             { name: 'Target Harian', value: nutritionInfo.tdee, fill: '#10b981' },
@@ -490,8 +490,8 @@ export default function App() {
                   <div>
                     <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Makronutrien (gram)</p>
 
-                    <div className="h-48">
-                      <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-48 min-h-[192px] w-full">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <BarChart
                           data={[
                             { 

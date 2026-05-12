@@ -3,38 +3,41 @@ export const onRequestPost: PagesFunction<{ POLLINATIONS_API_KEY: string }> = as
 
   try {
     const { prompt } = (await context.request.json()) as { prompt: string };
-    const apiKey = context.env.POLLINATIONS_API_KEY;
+    const apiKey = (context.env.POLLINATIONS_API_KEY || "").replace(/['"]+/g, '').trim();
 
     const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {})
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'openai',
         messages: [
           { 
             role: 'system', 
-            content: 'Anda adalah ahli gizi profesional. Berikan respon dalam format Markdown. Selalu sertakan ringkasan nutrisi di akhir dalam format JSON di dalam blok teks ---NUTRITION_JSON--- \{...\} ---END---.' 
+            content: 'Anda adalah ahli gizi profesional. Berikan respon dalam format Markdown. Selalu sertakan ringkasan nutrisi di akhir dalam format JSON di dalam blok teks ---NUTRITION_JSON--- {...} ---END---.' 
           },
           { 
             role: 'user', 
             content: prompt + '\n\nJangan lupa sertakan blok NUTRITION_JSON di akhir dengan struktur: {"calories": number, "protein": number, "carbs": number, "fat": number, "micronutrients": {"vitamin_a_mcg": number, "vitamin_c_mg": number, "calcium_mg": number, "iron_mg": number}}' 
           }
-        ]
+        ],
+        stream: false
       })
     });
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ error: `Pollinations API Error: ${response.status}` }), {
+      const errorBody = await response.text();
+      return new Response(JSON.stringify({ error: `Pollinations API Error: ${response.status}`, details: errorBody }), {
         status: response.status,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
     const data: any = await response.json();
-    const fullText = data.choices[0].message.content;
+    const fullText = data.choices?.[0]?.message?.content || "";
+
 
     // Extract JSON nutrition data
     const jsonMatch = fullText.match(/---NUTRITION_JSON---([\s\S]*?)---END---/);
