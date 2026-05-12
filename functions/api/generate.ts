@@ -4,13 +4,17 @@ export const onRequestPost: PagesFunction<{ POLLINATIONS_API_KEY: string }> = as
   try {
     const { prompt } = (await context.request.json()) as { prompt: string };
     const apiKey = (context.env.POLLINATIONS_API_KEY || "").replace(/['"]+/g, '').trim();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (apiKey && apiKey.length > 5) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
 
     const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
+      headers: headers,
       body: JSON.stringify({
         model: 'openai',
         messages: [

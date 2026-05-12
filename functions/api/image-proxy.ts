@@ -14,7 +14,7 @@ export const onRequestGet: PagesFunction<{ POLLINATIONS_API_KEY: string }> = asy
     const apiKey = (context.env.POLLINATIONS_API_KEY || "").replace(/['"]+/g, '').trim();
 
     const encodedPrompt = encodeURIComponent(prompt.trim());
-    let pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?width=${width}&height=${height}&nologo=${nologo}`;
+    let pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?width=${width}&height=${height}&nologo=${nologo}&model=zimage`;
     
     if (apiKey && apiKey.length > 5) {
       pollinationsUrl += `&key=${apiKey}`;

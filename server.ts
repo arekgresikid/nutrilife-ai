@@ -12,13 +12,17 @@ async function startServer() {
     try {
       const { prompt } = req.body;
       const apiKey = (process.env.POLLINATIONS_API_KEY || "").replace(/['"]+/g, '').trim();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (apiKey && apiKey.length > 5) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
       
       const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
+        headers: headers,
         body: JSON.stringify({
           model: 'openai',
           messages: [
@@ -86,7 +90,7 @@ async function startServer() {
       const apiKey = (process.env.POLLINATIONS_API_KEY || "").replace(/['"]+/g, '').trim();
 
       const encodedPrompt = encodeURIComponent(prompt.trim());
-      let pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?width=${width}&height=${height}&nologo=${nologo}`;
+      let pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?width=${width}&height=${height}&nologo=${nologo}&model=zimage`;
       
       if (apiKey && apiKey.length > 5) {
         pollinationsUrl += `&key=${apiKey}`;
