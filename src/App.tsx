@@ -177,50 +177,8 @@ export default function App() {
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
-  const downloadPDF = async () => {
-    const recipeElement = document.getElementById('recipe-content');
-    if (!recipeElement) return;
-    
-    try {
-      setLoading(true);
-      const canvas = await html2canvas(recipeElement, { 
-        scale: 2, 
-        useCORS: true,
-        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-        onclone: (clonedDoc) => {
-          // Robust fix for "oklch" error in html2canvas
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `
-            /* Force fallback colors for PDF to avoid oklch parsing issues */
-            * { 
-              color-scheme: light !important;
-            }
-            .prose, .prose * {
-              color: ${isDarkMode ? '#f8fafc' : '#1e293b'} !important;
-            }
-            /* Strip out problematic modern CSS functions */
-            [style*="oklch"] {
-              color: ${isDarkMode ? '#f8fafc' : '#1e293b'} !important;
-              background-color: transparent !important;
-            }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('Resep_Nutrisi_Life.pdf');
-    } catch (err) {
-      console.error('Error generating PDF:', err);
-      alert('Gagal mengunduh PDF. Silakan gunakan tangkapan layar (screenshot) sebagai alternatif.');
-    } finally {
-      setLoading(false);
-    }
+  const downloadPDF = () => {
+    window.print();
   };
 
   return (
@@ -584,7 +542,7 @@ export default function App() {
         </div>
 
         {/* Right Column: Recipe Result - Bento Grid Layout */}
-        <div className="md:col-span-7 space-y-6">
+        <div id="print-area" className="md:col-span-7 space-y-6">
           {recipe ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -648,10 +606,10 @@ export default function App() {
                       <ReactMarkdown>{recipe}</ReactMarkdown>
                     </div>
                   </div>
-                  <div className="bg-slate-50/80 dark:bg-slate-900/80 p-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap justify-end gap-3">
+                  <div className="bg-slate-50/80 dark:bg-slate-900/80 p-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap justify-end gap-3 no-print">
                     <Button onClick={downloadPDF} variant="outline" className="gap-2 border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20">
                       <Download className="w-4 h-4" />
-                      Unduh PDF
+                      Cetak / Simpan PDF
                     </Button>
                     <Button onClick={shareToWhatsApp} className="gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-none text-white shadow-lg shadow-emerald-500/20">
                       <Send className="w-4 h-4" />
