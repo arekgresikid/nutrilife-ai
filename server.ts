@@ -75,6 +75,44 @@ async function startServer() {
     }
   });
 
+  app.get('/api/image-proxy', async (req, res) => {
+    try {
+      const prompt = req.query.prompt ? String(req.query.prompt) : "";
+      if (!prompt) return res.status(400).json({ error: "Prompt is required" });
+
+      const width = req.query.width || '800';
+      const height = req.query.height || '600';
+      const nologo = req.query.nologo || 'true';
+      const apiKey = (process.env.POLLINATIONS_API_KEY || "").replace(/['"]+/g, '').trim();
+
+      const encodedPrompt = encodeURIComponent(prompt.trim());
+      let pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?width=${width}&height=${height}&nologo=${nologo}`;
+      
+      if (apiKey && apiKey.length > 5) {
+        pollinationsUrl += `&key=${apiKey}`;
+      }
+
+      const response = await fetch(pollinationsUrl);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        return res.status(response.status).send(`AI Image Error: ${errorText}`);
+      }
+
+      const contentType = response.headers.get("content-type") || "image/jpeg";
+      const buffer = await response.arrayBuffer();
+      const imageBuffer = Buffer.from(buffer);
+
+      res.setHeader("Content-Type", contentType);
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      res.send(imageBuffer);
+
+    } catch (error: any) {
+      console.error('Image Proxy Error:', error);
+      res.status(500).json({ error: error.message || 'Error proxying image' });
+    }
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

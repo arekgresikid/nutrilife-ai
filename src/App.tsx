@@ -142,8 +142,8 @@ export default function App() {
       // Extract Recipe Name for Image Generation
       const recipeName = data.recipe_name || (userData.mealPlanType === '1_recipe' ? 'Healthy Food Plating' : 'Healthy Meal Plan');
       
-      const imagePrompt = encodeURIComponent(`A delicious, high quality, professional food photography of ${recipeName}, healthy meal, beautiful plating, natural lighting, 4k`);
-      const genImageUrl = `https://gen.pollinations.ai/image/${imagePrompt}?width=800&height=600&nologo=true`;
+      const imagePrompt = encodeURIComponent(recipeName);
+      const genImageUrl = `/api/image-proxy?prompt=${imagePrompt}&width=800&height=600&nologo=true`;
       setImageUrl(genImageUrl);
 
       // Save to history
@@ -460,8 +460,8 @@ export default function App() {
                   <div>
                     <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Kalori (kkal)</p>
 
-                    <div className="h-24 min-h-[96px] w-full">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                    <div className="h-24 min-h-[96px] w-full" style={{ position: 'relative' }}>
+                      <ResponsiveContainer width="100%" height="100%" debounce={100}>
                         <BarChart
                           data={[
                             { name: 'Target Harian', value: nutritionInfo.tdee, fill: '#10b981' },
@@ -490,8 +490,8 @@ export default function App() {
                   <div>
                     <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Makronutrien (gram)</p>
 
-                    <div className="h-48 min-h-[192px] w-full">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                    <div className="h-48 min-h-[192px] w-full" style={{ position: 'relative' }}>
+                      <ResponsiveContainer width="100%" height="100%" debounce={100}>
                         <BarChart
                           data={[
                             { 
