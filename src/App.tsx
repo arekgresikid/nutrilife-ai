@@ -183,9 +183,32 @@ export default function App() {
     
     try {
       setLoading(true);
-      const canvas = await html2canvas(recipeElement, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL('image/png');
+      const canvas = await html2canvas(recipeElement, { 
+        scale: 2, 
+        useCORS: true,
+        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+        onclone: (clonedDoc) => {
+          // Robust fix for "oklch" error in html2canvas
+          const style = clonedDoc.createElement('style');
+          style.innerHTML = `
+            /* Force fallback colors for PDF to avoid oklch parsing issues */
+            * { 
+              color-scheme: light !important;
+            }
+            .prose, .prose * {
+              color: ${isDarkMode ? '#f8fafc' : '#1e293b'} !important;
+            }
+            /* Strip out problematic modern CSS functions */
+            [style*="oklch"] {
+              color: ${isDarkMode ? '#f8fafc' : '#1e293b'} !important;
+              background-color: transparent !important;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+        }
+      });
       
+      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -194,7 +217,7 @@ export default function App() {
       pdf.save('Resep_Nutrisi_Life.pdf');
     } catch (err) {
       console.error('Error generating PDF:', err);
-      alert('Gagal mengunduh PDF');
+      alert('Gagal mengunduh PDF. Silakan gunakan tangkapan layar (screenshot) sebagai alternatif.');
     } finally {
       setLoading(false);
     }
